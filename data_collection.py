@@ -20,9 +20,9 @@ def fetch_season_history(teams):
     return season_df
 
 def calculate_game_context(df):
-    # calculate rest days 
     df['GAME_DATE'] = pd.to_datetime(df['GAME_DATE'])
     df = df.sort_values(by=['id', 'GAME_DATE'])
+    # calculate rest days 
     df['Rest_Days'] = df.groupby('id')['GAME_DATE'].diff().dt.days
     df['Rest_Days'] = df['Rest_Days'].fillna(0)
 
@@ -47,6 +47,30 @@ def calculate_game_context(df):
 
     return df 
 
+def calculate_basic_team_stats(df):
+    df['GAME_DATE'] = pd.to_datetime(df['GAME_DATE'])
+    df = df.sort_values(by=['id', 'GAME_DATE'])
+
+    # calculate points per game rolling average
+    df['PPG_5GM_AVG'] = df.groupby('id')['PTS'].transform(lambda x: x.shift().rolling(5).mean())
+
+    # calculate field goal percentage rolling average 
+    df['FG_PCT_5GM_AVG'] = df.groupby('id')['FG_PCT'].transform(lambda x: x.shift().rolling(5).mean())
+
+    # calculate 3 point field goal percentage rolling average
+    df['FG3_PCT_5GM_AVG'] = df.groupby('id')['FG3_PCT'].transform(lambda x: x.shift().rolling(5).mean())
+
+    # calculate rebound rolling average
+    df['REB_5GM_AVG'] = df.groupby('id')['REB'].transform(lambda x: x.shift().rolling(5).mean())
+    
+    # calculate assist rolling average
+    df['AST_5GM_AVG'] = df.groupby('id')['AST'].transform(lambda x: x.shift().rolling(5).mean())
+
+    # calculate turnover rolling average
+    df['TOV_5GM_AVG'] = df.groupby('id')['TOV'].transform(lambda x: x.shift().rolling(5).mean())
+
+    return df 
+
 def drop_features(df):
     df = df.drop(columns=['W', 'L', 'W_PCT', 'MIN', 'FGM', 'FGA', 'FG3M', 'FG3A', 'FTM', 'FTA', 'FT_PCT', 'OREB', 'DREB', 'STL', 'BLK'])
 
@@ -65,35 +89,28 @@ def merge_home_away(season_df):
     return merged_df
 
 # fetch team id and name for each team
-#teams_df = fetch_team_data()
+teams_df = fetch_team_data()
 
 # fetch 2023-24 regular season game history for each team
-#all_teams = teams_df['id']
-#season_df = fetch_season_history(all_teams)
+all_teams = teams_df['id']
+season_df = fetch_season_history(all_teams)
 
 # merge teams_df and season_df (adding team full name to season history)
-#df = pd.merge(teams_df, season_df, left_on='id', right_on='Team_ID')
+df = pd.merge(teams_df, season_df, left_on='id', right_on='Team_ID')
 
 # calculate and delete initial features
-#df = calculate_game_context(df)
-#df = drop_features(df)
-#print(df)
-#df.to_pickle('./temp.pkl')
+df = calculate_game_context(df)
+df = calculate_basic_team_stats(df)
+df = drop_features(df)
+print(df)
+print(df.columns)
+df.to_pickle('./temp.pkl')
 
 # one row for every game for every team -> merge rows from same game for both teams into one row (row contains information on both teams for one game) 
 #df = merge_home_away(df)
 
 
 # ------------------------------------------------------------------------------------------------------------------------------------
-
-df = pd.read_pickle('./temp.pkl')
-
-df['GAME_DATE'] = pd.to_datetime(df['GAME_DATE'])
-df = df.sort_values(by=['id', 'GAME_DATE'])
-# calculate ppg rolling average
-#df['PPG_5GM_AVG'] = df.groupby('id')['PTS'].transform(lambda x: x.shift().rolling(5).mean())
-
-
 
 # get individual player advanced statistics -> need to aggregate -> advanced team statistics & team recent performance  
 #boxscore = boxscoreadvancedv2.BoxScoreAdvancedV2(game_id='0022301188')
