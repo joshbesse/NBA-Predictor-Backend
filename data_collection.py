@@ -71,6 +71,50 @@ def calculate_basic_team_stats(df):
 
     return df 
 
+def convert_min_to_decimal(min_str):
+    if pd.isna(min_str):
+        return float('nan')
+    else:
+        minutes, seconds = min_str.split(':')
+        new_min_format = f"{int(float(minutes))}.{seconds}"
+        return float(new_min_format) 
+
+def calculate_advance_team_stats(df):
+    # df to store team advanced statistics for every team for every game 
+    team_adv_stats = pd.DataFrame()
+
+    # get list of all games for the regular season
+    all_games = df['Game_ID'].unique()
+
+    for game in all_games:
+        # get individual player advanced statistics -> need to aggregate and calculate team advanced statistics
+        adv_boxscore = boxscoreadvancedv2.BoxScoreAdvancedV2(game_id=game)
+        adv_stats_df = adv_boxscore.get_data_frames()[0]
+
+        # convert MIN format from MM:SS string to MM.SS float
+        adv_stats_df['MIN'] = adv_stats_df['MIN'].apply(convert_min_to_decimal)
+        adv_stats_df = adv_stats_df[adv_stats_df['MIN'] > 0]
+
+        # calculate team advanced statistics for both teams 
+        current_teams_adv_stats_df = adv_stats_df.groupby(['GAME_ID', 'TEAM_ID']).apply(
+            lambda x: pd.Series({
+                'Offensive_Rating': (x['OFF_RATING'] * x['MIN']).sum() / x['MIN'].sum(),
+                'Defensive_Rating': (x['DEF_RATING'] * x['MIN']).sum() / x['MIN'].sum(),
+                'Net_Rating': (x['NET_RATING'] * x['MIN']).sum() / x['MIN'].sum(),
+                'Pace': (x['PACE'] * x['MIN']).sum() / x['MIN'].sum(),
+                'Effective_FG_PCT': (x['EFG_PCT'] * x['MIN']).sum() / x['MIN'].sum(),
+                'True_Shooting_PCT': (x['TS_PCT'] * x['MIN']).sum() / x['MIN'].sum()
+            })
+        ).reset_index()
+
+        team_adv_stats = pd.concat([team_adv_stats, current_teams_adv_stats_df])
+        time.sleep(10)
+        print(team_adv_stats)
+
+    df = df.merge(team_adv_stats, left_on=['Game_ID', 'Team_ID'], right_on=['GAME_ID', 'TEAM_ID'])
+
+    return df
+    
 def drop_features(df):
     df = df.drop(columns=['W', 'L', 'W_PCT', 'MIN', 'FGM', 'FGA', 'FG3M', 'FG3A', 'FTM', 'FTA', 'FT_PCT', 'OREB', 'DREB', 'STL', 'BLK'])
 
@@ -98,12 +142,13 @@ season_df = fetch_season_history(all_teams)
 # merge teams_df and season_df (adding team full name to season history)
 df = pd.merge(teams_df, season_df, left_on='id', right_on='Team_ID')
 
-# calculate and delete initial features
+# calculate features
 df = calculate_game_context(df)
 df = calculate_basic_team_stats(df)
-df = drop_features(df)
-print(df)
-print(df.columns)
+df = calculate_advance_team_stats(df)
+
+# delete features
+#df = drop_features(df)
 df.to_pickle('./temp.pkl')
 
 # one row for every game for every team -> merge rows from same game for both teams into one row (row contains information on both teams for one game) 
@@ -112,9 +157,13 @@ df.to_pickle('./temp.pkl')
 
 # ------------------------------------------------------------------------------------------------------------------------------------
 
-# get individual player advanced statistics -> need to aggregate -> advanced team statistics & team recent performance  
-#boxscore = boxscoreadvancedv2.BoxScoreAdvancedV2(game_id='0022301188')
-#advanced = boxscore.get_data_frames()[0]
-#print(advanced[['OFF_RATING', 'DEF_RATING', 'NET_RATING']])
+
+
+
+
+
+
+
+
 
 # key player information -> manually collect 
