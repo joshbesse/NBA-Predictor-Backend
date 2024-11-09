@@ -109,7 +109,6 @@ def calculate_advance_team_stats(df):
 
         team_adv_stats = pd.concat([team_adv_stats, current_teams_adv_stats_df])
         time.sleep(10)
-        print(team_adv_stats)
 
     df = df.merge(team_adv_stats, left_on=['Game_ID', 'Team_ID'], right_on=['GAME_ID', 'TEAM_ID'])
 
