@@ -115,6 +115,7 @@ def calculate_advance_team_stats(df):
     return df
     
 def calculate_key_player_stats(df):
+    # manually collected stats on number of all star and all nba players
     key_players_df = pd.DataFrame({
         'team_name': ['Boston Celtics', 'Brooklyn Nets', 'New York Knicks', 'Philadelphia 76ers', 'Toronto Raptors',
                     'Chicago Bulls', 'Cleveland Cavaliers', 'Detroit Pistons', 'Indiana Pacers', 'Milwaukee Bucks',
@@ -139,6 +140,36 @@ def calculate_key_player_stats(df):
     df = df.merge(key_players_df, left_on='full_name', right_on='team_name')
     
     return df 
+
+def calculate_recent_performance(df):
+    # calculate win/loss streaks
+    streaks = []
+    current_streak = 0
+    last_result = None
+
+    for result in df['WL']:
+        if result == last_result:
+            if result == 'W':
+                current_streak += 1
+            else:
+                current_streak -= 1
+        else:
+            if result == 'W':
+                current_streak = 1
+                last_result = result
+            else:
+                current_streak = -1
+                last_result = result
+        streaks.append(current_streak)
+
+    df['Streak'] = streaks
+
+    # calculate last 5 game win percentage
+    df = df.sort_values(by=['Team_ID', 'GAME_DATE'])
+    df['Win'] = df['WL'].map({'W': 1, 'L': 0})
+    df['5GM_Win_Pct'] = df.groupby('Team_ID')['Win'].rolling(window=5, min_periods=1).mean().values
+
+    return df
 
 def drop_features(df):
     df = df.drop(columns=['W', 'L', 'W_PCT', 'MIN', 'FGM', 'FGA', 'FG3M', 'FG3A', 'FTM', 'FTA', 'FT_PCT', 'OREB', 'DREB', 'STL', 'BLK'])
@@ -172,6 +203,7 @@ def merge_home_away(season_df):
 #df = calculate_basic_team_stats(df)
 #df = calculate_advance_team_stats(df)
 #df = calculate_key_player_stats(df)
+#df = calculate_recent_performance(df)
 
 # delete features
 #df = drop_features(df)
@@ -186,6 +218,10 @@ df = pd.read_pickle('./temp.pkl')
 df = calculate_key_player_stats(df)
 print(df)
 print(df.columns)
+df = calculate_recent_performance(df)
+print(df)
+print(df.columns)
+
 
 
 
