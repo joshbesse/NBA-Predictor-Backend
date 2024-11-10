@@ -22,6 +22,7 @@ def fetch_season_history(teams):
 def calculate_game_context(df):
     df['GAME_DATE'] = pd.to_datetime(df['GAME_DATE'])
     df = df.sort_values(by=['id', 'GAME_DATE'])
+
     # calculate rest days 
     df['Rest_Days'] = df.groupby('id')['GAME_DATE'].diff().dt.days
     df['Rest_Days'] = df['Rest_Days'].fillna(0)
@@ -172,7 +173,20 @@ def calculate_recent_performance(df):
     return df
 
 def drop_features(df):
-    df = df.drop(columns=['W', 'L', 'W_PCT', 'MIN', 'FGM', 'FGA', 'FG3M', 'FG3A', 'FTM', 'FTA', 'FT_PCT', 'OREB', 'DREB', 'STL', 'BLK'])
+    # drop unwanted features
+    df = df.drop(columns=['id', 'MATCHUP', 'W', 'L', 'W_PCT', 'MIN', 'FGM', 'FGA', 
+                        'FG_PCT', 'FG3M', 'FG3A', 'FG3_PCT', 'FTM', 'FTA', 'FT_PCT',
+                        'OREB', 'DREB', 'REB', 'AST', 'STL', 'BLK', 'TOV', 'PF', 'PTS',
+                        'GAME_ID', 'TEAM_ID', 'team_name', 'Win'])
+    
+    # rename columns
+    columns = ['Team_Name', 'Team_ID', 'Game_ID', 'Game_Date', 'WL', 'Rest_Days',
+            'Home_Court_Advantage', 'Home_Win_PCT', 'Away_Win_PCT', 'PPG_5GM_AVG',
+            'FG_PCT_5GM_AVG', 'FG3_PCT_5GM_AVG', 'REB_5GM_AVG', 'AST_5GM_AVG',
+            'TOV_5GM_AVG', 'Offensive_Rating', 'Defensive_Rating', 'Net_Rating',
+            'Pace', 'Effective_FG_PCT', 'True_Shooting_PCT', 'All_Star_Players',
+            'All_NBA_Players', 'Win/Loss Streak', '5GM_Win_PCT']
+    df.columns = columns
 
     return df 
 
@@ -198,16 +212,15 @@ def merge_home_away(season_df):
 # merge teams_df and season_df (adding team full name to season history)
 #df = pd.merge(teams_df, season_df, left_on='id', right_on='Team_ID')
 
-# calculate features
+# calculate new features
 #df = calculate_game_context(df)
 #df = calculate_basic_team_stats(df)
 #df = calculate_advance_team_stats(df)
 #df = calculate_key_player_stats(df)
 #df = calculate_recent_performance(df)
 
-# delete features
+# delete unwanted features and rename columns 
 #df = drop_features(df)
-#df.to_pickle('./temp.pkl')
 
 # one row for every game for every team -> merge rows from same game for both teams into one row (row contains information on both teams for one game) 
 #df = merge_home_away(df)
@@ -215,15 +228,12 @@ def merge_home_away(season_df):
 
 # ------------------------------------------------------------------------------------------------------------------------------------
 df = pd.read_pickle('./temp.pkl')
-df = calculate_key_player_stats(df)
 print(df)
 print(df.columns)
-df = calculate_recent_performance(df)
+df = drop_features(df)
 print(df)
 print(df.columns)
 
 
 
-
-
-# key player information -> manually collect 
+# drop WL_away after merging 
