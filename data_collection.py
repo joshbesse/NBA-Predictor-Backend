@@ -114,6 +114,32 @@ def calculate_advance_team_stats(df):
 
     return df
     
+def calculate_key_player_stats(df):
+    key_players_df = pd.DataFrame({
+        'team_name': ['Boston Celtics', 'Brooklyn Nets', 'New York Knicks', 'Philadelphia 76ers', 'Toronto Raptors',
+                    'Chicago Bulls', 'Cleveland Cavaliers', 'Detroit Pistons', 'Indiana Pacers', 'Milwaukee Bucks',
+                    'Atlanta Hawks', 'Charlotte Hornets', 'Miami Heat', 'Orlando Magic', 'Washington Wizards',
+                    'Denver Nuggets', 'Minnesota Timberwolves', 'Oklahoma City Thunder', 'Portland Trail Blazers', 'Utah Jazz',
+                    'Golden State Warriors', 'Los Angeles Clippers', 'Los Angeles Lakers', 'Phoenix Suns', 'Sacramento Kings',
+                    'Dallas Mavericks', 'Houston Rockets', 'Memphis Grizzlies', 'New Orleans Pelicans', 'San Antonio Spurs'],
+        'all_star_players': [2, 0, 2, 3, 1,
+                            0, 1, 0, 1, 2,
+                            1, 0, 1, 1, 0,
+                            1, 2, 1, 0, 0,
+                            1, 1, 2, 2, 0,
+                            1, 0, 0, 0, 0],
+        'all_nba_players': [1, 0, 1, 0, 0,
+                            0, 0, 0, 1, 1,
+                            0, 0, 0, 0, 0,
+                            1, 1, 1, 0, 0,
+                            1, 1, 2, 2, 1,
+                            1, 0, 0, 0, 0]
+    })
+
+    df = df.merge(key_players_df, left_on='full_name', right_on='team_name')
+    
+    return df 
+
 def drop_features(df):
     df = df.drop(columns=['W', 'L', 'W_PCT', 'MIN', 'FGM', 'FGA', 'FG3M', 'FG3A', 'FTM', 'FTA', 'FT_PCT', 'OREB', 'DREB', 'STL', 'BLK'])
 
@@ -132,35 +158,34 @@ def merge_home_away(season_df):
     return merged_df
 
 # fetch team id and name for each team
-teams_df = fetch_team_data()
+#teams_df = fetch_team_data()
 
 # fetch 2023-24 regular season game history for each team
-all_teams = teams_df['id']
-season_df = fetch_season_history(all_teams)
+#all_teams = teams_df['id']
+#season_df = fetch_season_history(all_teams)
 
 # merge teams_df and season_df (adding team full name to season history)
-df = pd.merge(teams_df, season_df, left_on='id', right_on='Team_ID')
+#df = pd.merge(teams_df, season_df, left_on='id', right_on='Team_ID')
 
 # calculate features
-df = calculate_game_context(df)
-df = calculate_basic_team_stats(df)
-df = calculate_advance_team_stats(df)
+#df = calculate_game_context(df)
+#df = calculate_basic_team_stats(df)
+#df = calculate_advance_team_stats(df)
+#df = calculate_key_player_stats(df)
 
 # delete features
 #df = drop_features(df)
-df.to_pickle('./temp.pkl')
+#df.to_pickle('./temp.pkl')
 
 # one row for every game for every team -> merge rows from same game for both teams into one row (row contains information on both teams for one game) 
 #df = merge_home_away(df)
 
 
 # ------------------------------------------------------------------------------------------------------------------------------------
-
-
-
-
-
-
+df = pd.read_pickle('./temp.pkl')
+df = calculate_key_player_stats(df)
+print(df)
+print(df.columns)
 
 
 
