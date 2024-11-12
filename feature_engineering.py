@@ -139,4 +139,6 @@ df = calculate_recent_performance(df)
 
 # delete unwanted features and rename columns 
 df = drop_features(df)
+print(df)
 df.to_pickle('./feature.pkl')
+print("Saved feature engineered data.")
