@@ -2,7 +2,6 @@ import pandas as pd
 
 #def missing_values(df):
     
-
 def merge_home_away(season_df):
     # calculate if home or away team
     season_df['home_or_away'] = season_df['MATCHUP'].apply(lambda x: 'Home' if 'vs.' in x else 'Away')
@@ -22,9 +21,14 @@ def merge_home_away(season_df):
     return merged_df
 
 # load featured engineered data
-df = pd.read_pickle('./feature.pkl')
+df = pd.read_pickle('./data.pkl')
 print(df)
 print(df.columns)
+
+
+print(df.info())
+# Offensive_Rating, Defensive_Rating, Net_Rating, Pace, Effective_FG_PCT, True_Shooting_PCT have 150 missing values 
+
 
 
 # one row for every game for every team -> merge rows from same game for both teams into one row (row contains information on both teams for one game) 

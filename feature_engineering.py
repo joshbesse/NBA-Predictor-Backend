@@ -51,7 +51,32 @@ def calculate_basic_team_stats(df):
     # calculate turnover rolling average
     df['TOV_5GM_AVG'] = df.groupby('id')['TOV'].transform(lambda x: x.shift().rolling(5).mean())
 
+    df[['PPG_5GM_AVG', 'FG_PCT_5GM_AVG', 'FG3_PCT_5GM_AVG', 'REB_5GM_AVG', 'AST_5GM_AVG', 'TOV_5GM_AVG']] = df[['PPG_5GM_AVG', 'FG_PCT_5GM_AVG', 'FG3_PCT_5GM_AVG', 'REB_5GM_AVG', 'AST_5GM_AVG', 'TOV_5GM_AVG']].fillna(0)
+
     return df 
+
+def calculate_advanced_team_stats(df):
+    # calculate offensive rating rolling average
+    df['Off_Rating_5GM_AVG'] = df.groupby('id')['Offensive_Rating'].transform(lambda x: x.shift().rolling(5).mean())
+
+    # calculate defensive rating rolling average
+    df['Def_Rating_5GM_AVG'] = df.groupby('id')['Defensive_Rating'].transform(lambda x: x.shift().rolling(5).mean())
+
+    # calculate net rating rolling average
+    df['Net_Rating_5GM_AVG'] = df.groupby('id')['Net_Rating'].transform(lambda x: x.shift().rolling(5).mean())
+
+    # calculate pace rolling average
+    df['Pace_5GM_AVG'] = df.groupby('id')['Pace'].transform(lambda x: x.shift().rolling(5).mean())
+
+    # calculate effective field goal percentage rolling average
+    df['Eff_FG_PCT_5GM_AVG'] = df.groupby('id')['Effective_FG_PCT'].transform(lambda x: x.shift().rolling(5).mean())
+
+    # calculate true shooting percentage rolling average
+    df['TS_5GM_AVG'] = df.groupby('id')['True_Shooting_PCT'].transform(lambda x: x.shift().rolling(5).mean())
+
+    df[['Off_Rating_5GM_AVG', 'Def_Rating_5GM_AVG', 'Net_Rating_5GM_AVG', 'Pace_5GM_AVG', 'Eff_FG_PCT_5GM_AVG', 'TS_5GM_AVG']] = df[['Off_Rating_5GM_AVG', 'Def_Rating_5GM_AVG', 'Net_Rating_5GM_AVG', 'Pace_5GM_AVG', 'Eff_FG_PCT_5GM_AVG', 'TS_5GM_AVG']].fillna(0)
+
+    return df
 
 def calculate_key_player_stats(df):
     # manually collected stats on number of all star and all nba players
@@ -115,30 +140,46 @@ def drop_features(df):
     df = df.drop(columns=['id', 'W', 'L', 'W_PCT', 'MIN', 'FGM', 'FGA', 
                         'FG_PCT', 'FG3M', 'FG3A', 'FG3_PCT', 'FTM', 'FTA', 'FT_PCT',
                         'OREB', 'DREB', 'REB', 'AST', 'STL', 'BLK', 'TOV', 'PF', 'PTS',
-                        'GAME_ID', 'TEAM_ID', 'team_name', 'Win'])
+                        'GAME_ID', 'TEAM_ID', 'Offensive_Rating', 'Defensive_Rating',
+                        'Net_Rating', 'Pace', 'Effective_FG_PCT', 'True_Shooting_PCT',
+                          'team_name', 'Win'])
     
     # rename columns
     columns = ['Team_Name', 'Team_ID', 'Game_ID', 'Game_Date', 'MATCHUP', 'WL', 'Rest_Days',
             'Home_Court_Advantage', 'Home_Win_PCT', 'Away_Win_PCT', 'PPG_5GM_AVG',
             'FG_PCT_5GM_AVG', 'FG3_PCT_5GM_AVG', 'REB_5GM_AVG', 'AST_5GM_AVG',
-            'TOV_5GM_AVG', 'Offensive_Rating', 'Defensive_Rating', 'Net_Rating',
-            'Pace', 'Effective_FG_PCT', 'True_Shooting_PCT', 'All_Star_Players',
+            'TOV_5GM_AVG', 'Off_Rating_5GM_AVG', 'Def_Rating_5GM_AVG', 'Net_Rating_5GM_AVG',
+            'Pace_5GM_AVG', 'Eff_FG_PCT_5GM_AVG', 'TS_5GM_AVG', 'All_Star_Players',
             'All_NBA_Players', 'Win/Loss_Streak', '5GM_Win_PCT']
     df.columns = columns
 
     return df 
 
+def feature_engineering_pipeline(df):
+    # 1: add game context features
+    df = calculate_game_context(df)
+
+    # 2: add rolling averages for basic and advanced stats 
+    df = calculate_basic_team_stats(df)
+    df = calculate_advanced_team_stats(df)
+
+    # 3: add key player stats
+    df = calculate_key_player_stats(df)
+
+    # 4: add recent performance stats 
+    df = calculate_recent_performance(df)
+
+    # 5: drop unnecessary features
+    df = drop_features(df)
+
+    return df
+
 # load collected data
 df = pd.read_pickle('./data.pkl')
 
-# calculate new features
-df = calculate_game_context(df)
-df = calculate_basic_team_stats(df)
-df = calculate_key_player_stats(df)
-df = calculate_recent_performance(df)
-
-# delete unwanted features and rename columns 
-df = drop_features(df)
+# apply feature engineering pipeline
+df = feature_engineering_pipeline(df)
 print(df)
+print(df.columns)
 df.to_pickle('./feature.pkl')
 print("Saved feature engineered data.")
