@@ -57,6 +57,9 @@ def pipeline(df):
     # encode target variable -> 1 if home team win and 0 if away team win
     df['Target'] = df['WL_home'].map({'W': 1, 'L': 0})
 
+    # sort by game date for later data splitting
+    df = df.sort_values('Game_Date') 
+
     # drop redundant and game identification features
     df = drop_features(df)
 
