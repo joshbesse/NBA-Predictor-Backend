@@ -1,7 +1,10 @@
 import pandas as pd 
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
-import seaborn as sns 
+import seaborn as sns   
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import accuracy_score, classification_report
 
 # load data
 df = pd.read_pickle('./final.pkl')
@@ -25,13 +28,30 @@ plt.show()
 # split the data into training, validation, and testing sets
 # need validation set for tuning regularization parameter
 # need to split chronologically to avoid leaking future information into past predictions 
-train_split = int(len(scaled_df) * 0.70)
-val_split = int(len(scaled_df) * 0.85)
+train_split = int(len(scaled_df) * 0.80)
 
 train_df = scaled_df[:train_split]
-val_df = scaled_df[train_split:val_split]
-test_df = scaled_df[val_split:]
+test_df = scaled_df[train_split:]
 
 X_train, y_train = train_df.drop(columns=['Target']), train_df['Target']
-X_val, y_val = val_df.drop(columns=['Target']), val_df['Target']
 X_test, y_test = test_df.drop(columns=['Target']), test_df['Target']
+
+# perform cross-validation to find optimal regularization parameter
+model = LogisticRegression(penalty='l2', solver='liblinear')
+
+param_grid = {'C': [0.01, 0.1, 1, 10, 100]}
+ridge_cv = GridSearchCV(model, param_grid=param_grid, cv=5, scoring='accuracy')
+ridge_cv.fit(X_train, y_train)
+
+print("Best Regularization Parameter (C): ", ridge_cv.best_params_)
+print("Validation Accuracy: ", ridge_cv.best_score_)
+
+best_model = ridge_cv.best_estimator_
+
+# evaluate model on test set
+y_test_pred = best_model.predict(X_test)
+
+accuracy = accuracy_score(y_test, y_test_pred)
+print("Test Accuracy: ", accuracy)
+class_report = classification_report(y_test, y_test_pred)
+print(class_report)
