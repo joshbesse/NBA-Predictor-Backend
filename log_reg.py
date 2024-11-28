@@ -39,7 +39,7 @@ X_test, y_test = test_df.drop(columns=['Target']), test_df['Target']
 # perform cross-validation to find optimal regularization parameter
 model = LogisticRegression(penalty='l2', solver='liblinear')
 
-param_grid = {'C': [0.01, 0.1, 1, 10, 100]}
+param_grid = {'C': [0.01, 0.1, 1, 10, 100, 500, 750, 1000]}
 ridge_cv = GridSearchCV(model, param_grid=param_grid, cv=5, scoring='accuracy')
 ridge_cv.fit(X_train, y_train)
 
