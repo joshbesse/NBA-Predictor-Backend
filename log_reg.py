@@ -48,6 +48,14 @@ print("Validation Accuracy: ", ridge_cv.best_score_)
 
 best_model = ridge_cv.best_estimator_
 
+results = pd.DataFrame(ridge_cv.cv_results_)
+plt.plot(results['param_C'], results['mean_test_score'])
+plt.xscale('log')
+plt.xlabel('Regularization Parameter (C)')
+plt.ylabel('Validation Accuracy')
+plt.title('Validation Accuracy vs. Regularization')
+plt.show()
+
 # evaluate model on test set
 y_test_pred = best_model.predict(X_test)
 
