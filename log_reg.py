@@ -56,6 +56,12 @@ plt.ylabel('Validation Accuracy')
 plt.title('Validation Accuracy vs. Regularization')
 plt.show()
 
+feature_importance = pd.DataFrame({
+    'Feature': X_train.columns,
+    'Coefficient': best_model.coef_[0]
+})
+print(feature_importance.sort_values(by='Coefficient', ascending=False))
+
 # evaluate model on test set
 y_test_pred = best_model.predict(X_test)
 
