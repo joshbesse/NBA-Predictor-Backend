@@ -34,6 +34,7 @@ rf_cv.fit(X_train, y_train)
 print("Best Parameters: ", rf_cv.best_params_)
 print("Best Validation Accuracy: ", rf_cv.best_score_)
 
+# get best model
 best_model = rf_cv.best_estimator_
 
 # evaluate model on test set
