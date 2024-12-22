@@ -62,25 +62,30 @@ def fetch_advance_team_stats(df):
 
 # fetch team id and name for each team
 teams_df = fetch_team_data()
+print(teams_df)
 
 # fetch 2023-24 regular season game history for each team
 all_teams = teams_df['id']
 season_df = fetch_season_history(all_teams)
+print(season_df)
 
 # merge teams_df and season_df (adding team full name to season history)
 season_df = pd.merge(teams_df, season_df, left_on='id', right_on='Team_ID')
 print(season_df)
+print(season_df.info())
 season_df.to_pickle('./season_hist.pkl')
 print("Saved season history data.")
 
 # fetch advance team statistics
 adv_team_stats_df = fetch_advance_team_stats(season_df)
 print(adv_team_stats_df)
+print(adv_team_stats_df.info())
 adv_team_stats_df.to_pickle('./adv_team_stats.pkl')
 print("Saved advance team statistics data.")
 
 # merge season_df and adv_team_stats_df (adding advance team stats to basic team stats)
 merged_df = season_df.merge(adv_team_stats_df, left_on=['Game_ID', 'Team_ID'], right_on=['GAME_ID', 'TEAM_ID'])
 print(merged_df)
+print(merged_df.info())
 merged_df.to_pickle('./data.pkl')
 print("Saved merged data.")
