@@ -88,4 +88,4 @@ merged_df = season_df.merge(adv_team_stats_df, left_on=['Game_ID', 'Team_ID'], r
 print(merged_df)
 print(merged_df.info())
 merged_df.to_pickle('./data.pkl')
-print("Saved merged data.")
+print("Saved merged data")
