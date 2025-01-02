@@ -64,9 +64,8 @@ def fetch_advance_team_stats(df):
 teams_df = fetch_team_data()
 
 # fetch 2023-24 regular season game history for each team
-#all_teams = teams_df['id']
-#season_df = fetch_season_history(all_teams)
-#print(season_df)
+team_ids = teams_df['id']
+season_df = fetch_season_history(team_ids)
 
 # merge teams_df and season_df (adding team full name to season history)
 #season_df = pd.merge(teams_df, season_df, left_on='id', right_on='Team_ID')
