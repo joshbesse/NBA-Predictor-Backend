@@ -46,12 +46,12 @@ def fetch_advance_team_stats(df):
         # calculate team advanced statistics for both teams 
         current_teams_adv_stats_df = adv_stats_df.groupby(['GAME_ID', 'TEAM_ID']).apply(
             lambda x: pd.Series({
-                'Offensive_Rating': (x['OFF_RATING'] * x['MIN']).sum() / x['MIN'].sum(),
-                'Defensive_Rating': (x['DEF_RATING'] * x['MIN']).sum() / x['MIN'].sum(),
-                'Net_Rating': (x['NET_RATING'] * x['MIN']).sum() / x['MIN'].sum(),
-                'Pace': (x['PACE'] * x['MIN']).sum() / x['MIN'].sum(),
-                'Effective_FG_PCT': (x['EFG_PCT'] * x['MIN']).sum() / x['MIN'].sum(),
-                'True_Shooting_PCT': (x['TS_PCT'] * x['MIN']).sum() / x['MIN'].sum()
+                'OFF_RATING': (x['OFF_RATING'] * x['MIN']).sum() / x['MIN'].sum(),
+                'DEF_RATING': (x['DEF_RATING'] * x['MIN']).sum() / x['MIN'].sum(),
+                'NET_RATING': (x['NET_RATING'] * x['MIN']).sum() / x['MIN'].sum(),
+                'PACE': (x['PACE'] * x['MIN']).sum() / x['MIN'].sum(),
+                'EFF_FG_PCT': (x['EFG_PCT'] * x['MIN']).sum() / x['MIN'].sum(),
+                'TS_PCT': (x['TS_PCT'] * x['MIN']).sum() / x['MIN'].sum()
             })
         ).reset_index()
 
@@ -73,11 +73,9 @@ season_df.to_pickle('./season_hist.pkl')
 print("Saved season history data.")
 
 # fetch advance team statistics
-#adv_team_stats_df = fetch_advance_team_stats(season_df)
-#print(adv_team_stats_df)
-#print(adv_team_stats_df.info())
-#adv_team_stats_df.to_pickle('./adv_team_stats.pkl')
-#print("Saved advance team statistics data.")
+adv_team_stats_df = fetch_advance_team_stats(season_df)
+adv_team_stats_df.to_pickle('./adv_team_stats.pkl')
+print("Saved advance team statistics data.")
 
 # merge season_df and adv_team_stats_df (adding advance team stats to basic team stats)
 #merged_df = season_df.merge(adv_team_stats_df, left_on=['Game_ID', 'Team_ID'], right_on=['GAME_ID', 'TEAM_ID'])
