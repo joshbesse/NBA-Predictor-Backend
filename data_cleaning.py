@@ -1,8 +1,36 @@
 import pandas as pd 
 
+def rename_columns(df):
+    # rename columns for consistent naming
+    df.rename(columns={
+        'id': 'TEAM_ID',
+        'full_name': 'TEAM_NAME',
+        'Game_ID': 'GAME_ID'
+    }, inplace=True)
+
+    # drop redundant columns
+    df.drop(columns=['Team_ID'], inplace=True)
+
+    return df
+
+def structure(df):
+    rows, columns = df.shape
+
+    print(f"DataFrame has {rows} rows.")
+    print(f"DataFrame has {columns} columns.")
+
 def missing_values(df):
-    print(df.info())
+    if df.isna().values.any():
+        print("DataFrame contains missing values.")
+    else:
+        print("DataFrame does not contain missing values.")
+    
+    print("Here is a missing value breakdown by column:")
     print(df.isna().sum())
+
+def duplicate_values(df):
+        
+
     
 def merge_home_away(season_df):
     # calculate if home or away team
@@ -68,14 +96,25 @@ def pipeline(df):
 
     return df
 
-# load featured engineered data
-df = pd.read_pickle('./feature.pkl')
+# load collected data (from data_collection.py)
+df = pd.read_pickle('./merged.pkl')
 
-# apply preparation pipeline
-df = pipeline(df)
+# clean up column names and redundant columns
+rename_columns(df)
+
+# check df structure
+structure(df)
+
+# check missing values
+missing_values(df)
+
+
+
+
+
 
 # save prepared data
-print(df)
-print(df.columns)
-df.to_pickle('./final.pkl')
-print("Saved prepared data.")
+#print(df)
+#print(df.columns)
+#df.to_pickle('./final.pkl')
+#print("Saved prepared data.")
