@@ -98,7 +98,7 @@ def pipeline(df):
     return df
 
 # load collected data (from data_collection.py)
-df = pd.read_pickle('./merged.pkl')
+df = pd.read_pickle('./Datasets/merged.pkl')
 
 # clean up column names and redundant columns
 rename_columns(df)
@@ -111,3 +111,9 @@ missing_values(df)
 
 # check duplicate observations
 duplicate_values(df)
+
+# save checked data
+print(df)
+print(df.info())
+df.to_pickle('./Datasets/checked.pkl')
+print("Saved checked data.")

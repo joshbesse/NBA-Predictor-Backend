@@ -69,17 +69,17 @@ season_df = fetch_season_history(team_ids)
 
 # merge teams_df and season_df (adding team full name to season history)
 season_df = pd.merge(teams_df, season_df, left_on='id', right_on='Team_ID')
-season_df.to_pickle('./season_hist.pkl')
+season_df.to_pickle('./Datasets/season_hist.pkl')
 print("Saved season history data.")
 
 # fetch advance team statistics
 adv_team_stats_df = fetch_advance_team_stats(season_df)
-adv_team_stats_df.to_pickle('./adv_team_stats.pkl')
+adv_team_stats_df.to_pickle('./Datasets/adv_team_stats.pkl')
 print("Saved advance team statistics data.")
 
 # merge season_df and adv_team_stats_df (adding advance team stats to basic team stats)
 merged_df = season_df.merge(adv_team_stats_df, left_on=['Game_ID', 'Team_ID'], right_on=['GAME_ID', 'TEAM_ID'])
 print(merged_df)
 print(merged_df.info())
-merged_df.to_pickle('./merged.pkl')
+merged_df.to_pickle('./Datasets/merged.pkl')
 print("Saved merged data")
