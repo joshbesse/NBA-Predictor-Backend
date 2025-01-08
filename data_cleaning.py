@@ -24,14 +24,15 @@ def missing_values(df):
         print("DataFrame contains missing values.")
     else:
         print("DataFrame does not contain missing values.")
-    
-    print("Here is a missing value breakdown by column:")
-    print(df.isna().sum())
 
 def duplicate_values(df):
-        
-
+    if df.duplicated().any():
+        print("DataFrame contains duplicate observations.")
+    else:
+        print("DataFrame does not contain duplicate observations.")
     
+
+
 def merge_home_away(season_df):
     # calculate if home or away team
     season_df['home_or_away'] = season_df['MATCHUP'].apply(lambda x: 'Home' if 'vs.' in x else 'Away')
@@ -108,13 +109,5 @@ structure(df)
 # check missing values
 missing_values(df)
 
-
-
-
-
-
-# save prepared data
-#print(df)
-#print(df.columns)
-#df.to_pickle('./final.pkl')
-#print("Saved prepared data.")
+# check duplicate observations
+duplicate_values(df)
