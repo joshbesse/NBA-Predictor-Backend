@@ -5,27 +5,38 @@ def rename_columns(df):
     df.rename(columns={
         'id': 'TEAM_ID',
         'full_name': 'TEAM_NAME',
-        'Game_ID': 'GAME_ID'
+        'Game_ID': 'GAME_ID',
+        'TEAM_ID': 'team_id',
+        'GAME_ID': 'game_id'
     }, inplace=True)
 
     # drop redundant columns
-    df.drop(columns=['Team_ID'], inplace=True)
+    df.drop(columns=['Team_ID', 'team_id', 'game_id'], inplace=True)
 
-    return df
+def fix_types(df):
+    # convert data types
+    df['GAME_ID'] = df['GAME_ID'].astype(int)
+    df['GAME_DATE'] = pd.to_datetime(df['GAME_DATE'])
+
+    # map WL
+    df['WL'] = df['WL'].apply(lambda x: 1 if x == 'W' else 0)
 
 def structure(df):
+    # print num rows and cols
     rows, columns = df.shape
 
     print(f"DataFrame has {rows} rows.")
     print(f"DataFrame has {columns} columns.")
 
 def missing_values(df):
+    # print if any missing values
     if df.isna().values.any():
         print("DataFrame contains missing values.")
     else:
         print("DataFrame does not contain missing values.")
 
 def duplicate_values(df):
+    # print if any duplicate observations 
     if df.duplicated().any():
         print("DataFrame contains duplicate observations.")
     else:
@@ -102,6 +113,9 @@ df = pd.read_pickle('./Datasets/merged.pkl')
 
 # clean up column names and redundant columns
 rename_columns(df)
+
+# fix data types
+fix_types(df)
 
 # check df structure
 structure(df)
