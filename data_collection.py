@@ -19,46 +19,26 @@ def fetch_season_history(teams):
 
     return season_df
 
-def convert_min_to_decimal(min_str):
-    if pd.isna(min_str):
-        return float('nan')
-    else:
-        minutes, seconds = min_str.split(':')
-        new_min_format = f"{int(float(minutes))}.{seconds}"
-        return float(new_min_format) 
-
-def fetch_advance_team_stats(df):
+def fetch_advanced_stats(df):
     # df to store team advanced statistics for every team for every game
-    team_adv_stats = pd.DataFrame()
+    adv_stats = pd.DataFrame()
 
     # get list of all games for the regular season
     all_games = df['Game_ID'].unique()
 
     for game in all_games:
-        # get individual player advanced statistics -> need to aggregate and calculate team advanced statistics
+        # get team advanced statistics
         adv_boxscore = boxscoreadvancedv2.BoxScoreAdvancedV2(game_id=game)
-        adv_stats_df = adv_boxscore.get_data_frames()[0]
+        adv_boxscore = adv_boxscore.get_data_frames()[1]
 
-        # convert MIN format from MM:SS string to MM.SS float
-        adv_stats_df['MIN'] = adv_stats_df['MIN'].apply(convert_min_to_decimal)
-        adv_stats_df = adv_stats_df[adv_stats_df['MIN'] > 0]
-
-        # calculate team advanced statistics for both teams 
-        current_teams_adv_stats_df = adv_stats_df.groupby(['GAME_ID', 'TEAM_ID']).apply(
-            lambda x: pd.Series({
-                'OFF_RATING': (x['OFF_RATING'] * x['MIN']).sum() / x['MIN'].sum(),
-                'DEF_RATING': (x['DEF_RATING'] * x['MIN']).sum() / x['MIN'].sum(),
-                'NET_RATING': (x['NET_RATING'] * x['MIN']).sum() / x['MIN'].sum(),
-                'PACE': (x['PACE'] * x['MIN']).sum() / x['MIN'].sum(),
-                'EFF_FG_PCT': (x['EFG_PCT'] * x['MIN']).sum() / x['MIN'].sum(),
-                'TS_PCT': (x['TS_PCT'] * x['MIN']).sum() / x['MIN'].sum()
-            })
-        ).reset_index()
-
-        team_adv_stats = pd.concat([team_adv_stats, current_teams_adv_stats_df])
+        # filter for wanted columns
+        adv_boxscore = adv_boxscore[['GAME_ID', 'TEAM_ID', 'OFF_RATING', 'DEF_RATING', 'NET_RATING', 'EFG_PCT', 'TM_TOV_PCT', 'AST_TOV', 'OREB_PCT', 'DREB_PCT', 'REB_PCT']] 
+        
+        adv_stats = pd.concat([adv_stats, adv_boxscore])
+        # add delay to requests to nba_api otherwise error 
         time.sleep(10)
 
-    return team_adv_stats 
+    return adv_stats 
 
 # fetch team id and name for each team
 teams_df = fetch_team_data()
@@ -73,12 +53,12 @@ season_df.to_pickle('./Datasets/season_hist.pkl')
 print("Saved season history data.")
 
 # fetch advance team statistics
-adv_team_stats_df = fetch_advance_team_stats(season_df)
-adv_team_stats_df.to_pickle('./Datasets/adv_team_stats.pkl')
-print("Saved advance team statistics data.")
+adv_stats_df = fetch_advanced_stats(season_df)
+adv_stats_df.to_pickle('./Datasets/adv_stats.pkl')
+print("Saved advanced statistics data.")
 
 # merge season_df and adv_team_stats_df (adding advance team stats to basic team stats)
-merged_df = season_df.merge(adv_team_stats_df, left_on=['Game_ID', 'Team_ID'], right_on=['GAME_ID', 'TEAM_ID'])
+merged_df = pd.merge(season_df, adv_stats_df, left_on=['Game_ID', 'Team_ID'], right_on=['GAME_ID', 'TEAM_ID'])
 print(merged_df)
 print(merged_df.info())
 merged_df.to_pickle('./Datasets/merged.pkl')
