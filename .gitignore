@@ -1,6 +1,6 @@
 nba_pred_venv
 
 season_hist.pkl
-adv_team_stats.pkl
+adv_stats.pkl
 merged.pkl
 checked.pkl
