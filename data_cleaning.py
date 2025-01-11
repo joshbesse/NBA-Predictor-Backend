@@ -13,6 +13,10 @@ def rename_columns(df):
     # drop redundant columns
     df.drop(columns=['Team_ID', 'team_id', 'game_id'], inplace=True)
 
+def add_features(df):
+    df['FTA_RATE'] = (df['FTA'] / df['FGA']).round(3)
+    df['FG3A_RATE'] = (df['FG3A'] / df['FGA']).round(3) 
+
 def fix_types(df):
     # convert data types
     df['GAME_ID'] = df['GAME_ID'].astype(int)
@@ -41,7 +45,7 @@ def duplicate_values(df):
         print("DataFrame contains duplicate observations.")
     else:
         print("DataFrame does not contain duplicate observations.")
-    
+
 
 
 def merge_home_away(season_df):
@@ -113,6 +117,9 @@ df = pd.read_pickle('./Datasets/merged.pkl')
 
 # clean up column names and redundant columns
 rename_columns(df)
+
+# add free throw rate and 3 point attempt rate columns 
+add_features(df)
 
 # fix data types
 fix_types(df)
