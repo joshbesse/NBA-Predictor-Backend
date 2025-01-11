@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 def summary_statistics(df):
     pd.set_option('display.max_columns', None)
@@ -314,16 +315,24 @@ def scatter(df):
     plt.subplots_adjust(right=0.7)
     plt.show()
 
+def corr_matrix(df):
+    corr_df = df[['WL', 'FGM', 'FGA', 'FG_PCT', 'FG3M', 'FG3A', 'FG3_PCT', 'FTM', 'FTA', 'FT_PCT', 'OREB', 'DREB', 'REB', 'AST', 'STL', 'BLK', 'TOV', 'PF', 'PTS', 'OFF_RATING', 'DEF_RATING', 'NET_RATING', 'EFG_PCT', 'TM_TOV_PCT', 'AST_TOV', 'OREB_PCT', 'DREB_PCT', 'REB_PCT', 'FTA_RATE', 'FG3A_RATE']]
+    corr_matrix = corr_df.corr()
+    plt.figure(figsize=(9, 7.5))
+    sns.heatmap(corr_matrix, cmap='coolwarm')
+    plt.title('Correlation Matrix', fontsize=16)
+    plt.xticks(fontsize=7)
+    plt.yticks(fontsize=7)
+    plt.show()
+
 # load checked data (from data_cleaning.py)
 df = pd.read_pickle('./Datasets/checked.pkl')
 
 # summary statistics
-#summary_statistics(df)
-
-#print(df['WL'].value_counts())
+summary_statistics(df)
 
 # histograms and boxplots of important features
-#distributions(df)
+distributions(df)
 
 # team summary statistics
 team_stats = team_summary_statistics(df)
@@ -333,5 +342,5 @@ print(team_stats)
 # team scatter plots
 scatter(team_stats)
 
-
-
+# correlation matrix
+corr_matrix(df)
