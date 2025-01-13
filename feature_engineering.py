@@ -8,9 +8,6 @@ def calculate_game_context(df):
     df['REST_DAYS'] = df.groupby('TEAM_NAME')['GAME_DATE'].diff().dt.days
     df['REST_DAYS'] = df['REST_DAYS'].fillna(0)   
 
-    # home court advantage
-    df['HOME_ADVANTAGE'] = df['MATCHUP'].apply(lambda x: 1 if 'vs.' in x else 0)
-
     # winning percentage rolling average and season to date average
     df['WIN_PCT'] = df.groupby('TEAM_NAME')['WL'].transform(lambda x: x.shift().expanding().mean().round(3))
     df['WIN_PCT_3GM'] = df.groupby('TEAM_NAME')['WL'].transform(lambda x: x.shift().rolling(3).mean().round(3))
@@ -31,8 +28,8 @@ def calculate_basic_stats(df):
     df['FGA_3GM_AVG'] = df.groupby('TEAM_NAME')['FGA'].transform(lambda x: x.shift().rolling(3).mean().round(2))
 
     # field goal percentage rolling average and season to date average
-    df['FG_PCT_AVG'] = df.groupby('TEAM_NAME')['FG_PCT'].transform(lambda x: x.shift().expanding().mean().round(2))
-    df['FG_PCT_3GM_AVG'] = df.groupby('TEAM_NAME')['FG_PCT'].transform(lambda x: x.shift().rolling(3).mean().round(2))
+    df['FG_PCT_AVG'] = df.groupby('TEAM_NAME')['FG_PCT'].transform(lambda x: x.shift().expanding().mean().round(3))
+    df['FG_PCT_3GM_AVG'] = df.groupby('TEAM_NAME')['FG_PCT'].transform(lambda x: x.shift().rolling(3).mean().round(3))
 
     # 3 point field goals made rolling average and season to date average
     df['FG3M_AVG'] = df.groupby('TEAM_NAME')['FG3M'].transform(lambda x: x.shift().expanding().mean().round(2))
@@ -43,8 +40,8 @@ def calculate_basic_stats(df):
     df['FG3A_3GM_AVG'] = df.groupby('TEAM_NAME')['FG3A'].transform(lambda x: x.shift().rolling(3).mean().round(2))
 
     # 3 point field goal percentage rolling average and season to date average
-    df['FG3_PCT_AVG'] = df.groupby('TEAM_NAME')['FG3_PCT'].transform(lambda x: x.shift().expanding().mean().round(2))
-    df['FG3_PCT_3GM_AVG'] = df.groupby('TEAM_NAME')['FG3_PCT'].transform(lambda x: x.shift().rolling(3).mean().round(2))
+    df['FG3_PCT_AVG'] = df.groupby('TEAM_NAME')['FG3_PCT'].transform(lambda x: x.shift().expanding().mean().round(3))
+    df['FG3_PCT_3GM_AVG'] = df.groupby('TEAM_NAME')['FG3_PCT'].transform(lambda x: x.shift().rolling(3).mean().round(3))
 
     # free throws made rolling average and season to date average
     df['FTM_AVG'] = df.groupby('TEAM_NAME')['FTM'].transform(lambda x: x.shift().expanding().mean().round(2))
@@ -55,8 +52,8 @@ def calculate_basic_stats(df):
     df['FTA_3GM_AVG'] = df.groupby('TEAM_NAME')['FTA'].transform(lambda x: x.shift().rolling(3).mean().round(2))
 
     # free throw percentage rolling average and season to date average
-    df['FT_PCT_AVG'] = df.groupby('TEAM_NAME')['FT_PCT'].transform(lambda x: x.shift().expanding().mean().round(2))
-    df['FT_PCT_3GM_AVG'] = df.groupby('TEAM_NAME')['FT_PCT'].transform(lambda x: x.shift().rolling(3).mean().round(2))
+    df['FT_PCT_AVG'] = df.groupby('TEAM_NAME')['FT_PCT'].transform(lambda x: x.shift().expanding().mean().round(3))
+    df['FT_PCT_3GM_AVG'] = df.groupby('TEAM_NAME')['FT_PCT'].transform(lambda x: x.shift().rolling(3).mean().round(3))
 
     # offensive rebounds rolling average and season to date average
     df['OREB_AVG'] = df.groupby('TEAM_NAME')['OREB'].transform(lambda x: x.shift().expanding().mean().round(2))
@@ -106,28 +103,28 @@ def calculate_advanced_stats(df):
     df['NET_RATING_3GM_AVG'] = df.groupby('TEAM_NAME')['NET_RATING'].transform(lambda x: x.shift().rolling(3).mean().round(2))
 
     # efficient field goal percentage rolling average and season to date average
-    df['EFG_PCT_AVG'] = df.groupby('TEAM_NAME')['EFG_PCT'].transform(lambda x: x.shift().expanding().mean().round(2))
-    df['EFG_PCT_3GM_AVG'] = df.groupby('TEAM_NAME')['EFG_PCT'].transform(lambda x: x.shift().rolling(3).mean().round(2))
+    df['EFG_PCT_AVG'] = df.groupby('TEAM_NAME')['EFG_PCT'].transform(lambda x: x.shift().expanding().mean().round(3))
+    df['EFG_PCT_3GM_AVG'] = df.groupby('TEAM_NAME')['EFG_PCT'].transform(lambda x: x.shift().rolling(3).mean().round(3))
 
     # turnover percentage rolling average and season to date average
-    df['TOV_PCT_AVG'] = df.groupby('TEAM_NAME')['TM_TOV_PCT'].transform(lambda x: x.shift().expanding().mean().round(2))
-    df['TOV_PCT_3GM_AVG'] = df.groupby('TEAM_NAME')['TM_TOV_PCT'].transform(lambda x: x.shift().rolling(3).mean().round(2))
+    df['TOV_PCT_AVG'] = df.groupby('TEAM_NAME')['TM_TOV_PCT'].transform(lambda x: x.shift().expanding().mean().round(3))
+    df['TOV_PCT_3GM_AVG'] = df.groupby('TEAM_NAME')['TM_TOV_PCT'].transform(lambda x: x.shift().rolling(3).mean().round(3))
 
     # assist to turnover ratio rolling average and season to date average
     df['AST_TOV_AVG'] = df.groupby('TEAM_NAME')['AST_TOV'].transform(lambda x: x.shift().expanding().mean().round(2))
     df['AST_TOV_3GM_AVG'] = df.groupby('TEAM_NAME')['AST_TOV'].transform(lambda x: x.shift().rolling(3).mean().round(2))
 
     # offensive rebound percentage rolling average and season to date average
-    df['OREB_PCT_AVG'] = df.groupby('TEAM_NAME')['OREB_PCT'].transform(lambda x: x.shift().expanding().mean().round(2))
-    df['OREB_PCT_3GM_AVG'] = df.groupby('TEAM_NAME')['OREB_PCT'].transform(lambda x: x.shift().rolling(3).mean().round(2))
+    df['OREB_PCT_AVG'] = df.groupby('TEAM_NAME')['OREB_PCT'].transform(lambda x: x.shift().expanding().mean().round(3))
+    df['OREB_PCT_3GM_AVG'] = df.groupby('TEAM_NAME')['OREB_PCT'].transform(lambda x: x.shift().rolling(3).mean().round(3))
 
     # defensive rebound percentage rolling average and season to date average
-    df['DREB_PCT_AVG'] = df.groupby('TEAM_NAME')['DREB_PCT'].transform(lambda x: x.shift().expanding().mean().round(2))
-    df['DREB_PCT_3GM_AVG'] = df.groupby('TEAM_NAME')['DREB_PCT'].transform(lambda x: x.shift().rolling(3).mean().round(2))
+    df['DREB_PCT_AVG'] = df.groupby('TEAM_NAME')['DREB_PCT'].transform(lambda x: x.shift().expanding().mean().round(3))
+    df['DREB_PCT_3GM_AVG'] = df.groupby('TEAM_NAME')['DREB_PCT'].transform(lambda x: x.shift().rolling(3).mean().round(3))
 
     # rebound percentage rolling average and season to date average
-    df['REB_PCT_AVG'] = df.groupby('TEAM_NAME')['REB_PCT'].transform(lambda x: x.shift().expanding().mean().round(2))
-    df['REB_PCT_3GM_AVG'] = df.groupby('TEAM_NAME')['REB_PCT'].transform(lambda x: x.shift().rolling(3).mean().round(2))
+    df['REB_PCT_AVG'] = df.groupby('TEAM_NAME')['REB_PCT'].transform(lambda x: x.shift().expanding().mean().round(3))
+    df['REB_PCT_3GM_AVG'] = df.groupby('TEAM_NAME')['REB_PCT'].transform(lambda x: x.shift().rolling(3).mean().round(3))
 
     # free throws attempted rate rolling average and season to date average
     df['FTA_RATE_AVG'] = df.groupby('TEAM_NAME')['FTA_RATE'].transform(lambda x: x.shift().expanding().mean().round(2))
@@ -181,13 +178,13 @@ def merge_home_away(df):
     away_df = df[df['home_or_away'] == 'Away'].copy()
 
     home_df = home_df.drop(columns=['home_or_away', 'MATCHUP'])
+    home_df.rename(columns={'WL': 'HOME_WIN'}, inplace=True)
     away_df = away_df.drop(columns=['home_or_away', 'MATCHUP', 'WL'])
 
     # merge home and away DataFrames resulting in one game per row
     merged_df = pd.merge(home_df, away_df, on=['GAME_ID', 'GAME_DATE'], suffixes=('_HOME', '_AWAY'))
 
     return merged_df
-
 
 # load explored data
 df = pd.read_pickle('./Datasets/checked.pkl')
