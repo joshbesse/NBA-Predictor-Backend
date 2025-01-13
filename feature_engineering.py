@@ -4,12 +4,16 @@ def calculate_game_context(df):
     # sort by team and game date 
     df = df.sort_values(['TEAM_NAME', 'GAME_DATE']).reset_index(drop=True)
 
-    # calculate rest days in between games
+    # rest days in between games
     df['REST_DAYS'] = df.groupby('TEAM_NAME')['GAME_DATE'].diff().dt.days
     df['REST_DAYS'] = df['REST_DAYS'].fillna(0)   
 
-    # calculate home court advantage
+    # home court advantage
     df['HOME_ADVANTAGE'] = df['MATCHUP'].apply(lambda x: 1 if 'vs.' in x else 0)
+
+    # winning percentage rolling average and season to date average
+    df['WIN_PCT'] = df.groupby('TEAM_NAME')['WL'].transform(lambda x: x.shift().expanding().mean().round(3))
+    df['WIN_PCT_3GM'] = df.groupby('TEAM_NAME')['WL'].transform(lambda x: x.shift().rolling(3).mean().round(3))
 
     return df
 
@@ -164,11 +168,9 @@ def calculate_key_player_stats(df):
 
 def drop_features(df):
     # drop unwanted features
-    df = df.drop(columns=['MIN', 'FGM', 'FGA', 'FG_PCT', 'FG3M', 'FG3A', 'FG3_PCT', 'FTM', 'FTA', 'FT_PCT', 'OREB', 'DREB', 'REB', 'AST', 'STL', 'BLK', 'TOV', 'PF', 'PTS', 'OFF_RATING', 'DEF_RATING', 'NET_RATING', 'EFG_PCT', 'TM_TOV_PCT', 'AST_TOV', 'OREB_PCT', 'DREB_PCT', 'REB_PCT', 'FTA_RATE', 'FG3A_RATE', 'team_name'])
+    df = df.drop(columns=['W', 'L', 'W_PCT', 'MIN', 'FGM', 'FGA', 'FG_PCT', 'FG3M', 'FG3A', 'FG3_PCT', 'FTM', 'FTA', 'FT_PCT', 'OREB', 'DREB', 'REB', 'AST', 'STL', 'BLK', 'TOV', 'PF', 'PTS', 'OFF_RATING', 'DEF_RATING', 'NET_RATING', 'EFG_PCT', 'TM_TOV_PCT', 'AST_TOV', 'OREB_PCT', 'DREB_PCT', 'REB_PCT', 'FTA_RATE', 'FG3A_RATE'])
 
     return df
-
-
 
 def merge_home_away(df):
     # calculate if team is home or away
@@ -186,36 +188,6 @@ def merge_home_away(df):
 
     return merged_df
 
-def calculate_recent_performance(df):
-    # calculate win/loss streaks
-    streaks = []
-    current_streak = 0
-    last_result = None
-
-    for result in df['WL']:
-        if result == last_result:
-            if result == 'W':
-                current_streak += 1
-            else:
-                current_streak -= 1
-        else:
-            if result == 'W':
-                current_streak = 1
-                last_result = result
-            else:
-                current_streak = -1
-                last_result = result
-        streaks.append(current_streak)
-
-    df['Streak'] = streaks
-
-    # calculate last 5 game win percentage
-    df = df.sort_values(by=['Team_ID', 'GAME_DATE'])
-    df['Win'] = df['WL'].map({'W': 1, 'L': 0})
-    df['5GM_Win_Pct'] = df.groupby('Team_ID')['Win'].rolling(window=5, min_periods=1).mean().values
-
-    return df
-
 
 # load explored data
 df = pd.read_pickle('./Datasets/checked.pkl')
@@ -230,12 +202,10 @@ df = calculate_basic_stats(df)
 df = calculate_advanced_stats(df)
 
 # calculate key player stats
-df = calculate_key_player_stats(df)
+#df = calculate_key_player_stats(df)
 
 # drop columns 
 df = drop_features(df)
-print(df.info())
 
-# transform into one game per row
-#df = merge_home_away(df)
-#print(df)
+# transform DataFrame into one game per row
+df = merge_home_away(df)
