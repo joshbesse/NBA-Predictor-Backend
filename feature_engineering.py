@@ -206,3 +206,12 @@ df = drop_features(df)
 
 # transform DataFrame into one game per row
 df = merge_home_away(df)
+
+# drop rows with missing values from rolling average calculations
+df = df.dropna()
+
+# save finalized data
+print(df)
+print(df.info())
+df.to_pickle('./Datasets/final.pkl')
+print("Saved finalized data.")
