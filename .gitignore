@@ -5,3 +5,8 @@ adv_stats.pkl
 merged.pkl
 checked.pkl
 final.pkl
+test_merged.pkl
+test_checked.pkl
+test_final.pkl
+
+__pycache__
