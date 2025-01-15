@@ -187,7 +187,8 @@ def merge_home_away(df):
     return merged_df
 
 # load explored data
-df = pd.read_pickle('./Datasets/checked.pkl')
+#df = pd.read_pickle('./Datasets/checked.pkl')
+df = pd.read_pickle('./Datasets/test_checked.pkl')
 
 # calculate game context
 df = calculate_game_context(df)
@@ -213,5 +214,6 @@ df = df.dropna()
 # save finalized data
 print(df)
 print(df.info())
-df.to_pickle('./Datasets/final.pkl')
+#df.to_pickle('./Datasets/final.pkl')
+df.to_pickle('./Datasets/test_final.pkl')
 print("Saved finalized data.")

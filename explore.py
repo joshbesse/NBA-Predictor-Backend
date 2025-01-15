@@ -326,7 +326,8 @@ def corr_matrix(df):
     plt.show()
 
 # load checked data (from data_cleaning.py)
-df = pd.read_pickle('./Datasets/checked.pkl')
+#df = pd.read_pickle('./Datasets/checked.pkl')
+df = pd.read_pickle('./Datasets/test_checked.pkl')
 
 # summary statistics
 summary_statistics(df)

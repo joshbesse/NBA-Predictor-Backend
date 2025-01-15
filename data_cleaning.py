@@ -47,7 +47,8 @@ def duplicate_values(df):
         print("DataFrame does not contain duplicate observations.")
 
 # load collected data (from data_collection.py)
-df = pd.read_pickle('./Datasets/merged.pkl')
+#df = pd.read_pickle('./Datasets/merged.pkl')
+df = pd.read_pickle('./Datasets/test_merged.pkl')
 
 # clean up column names and redundant columns
 rename_columns(df)
@@ -70,5 +71,6 @@ duplicate_values(df)
 # save checked data
 print(df)
 print(df.info())
-df.to_pickle('./Datasets/checked.pkl')
+#df.to_pickle('./Datasets/checked.pkl')
+df.to_pickle('./Datasets/test_checked.pkl')
 print("Saved checked data.")

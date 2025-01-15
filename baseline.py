@@ -2,7 +2,8 @@ import pandas as pd
 from sklearn.metrics import accuracy_score
 
 # load finalized data
-df = pd.read_pickle('./Datasets/final.pkl')
+#df = pd.read_pickle('./Datasets/final.pkl')
+df = pd.read_pickle('./Datasets/test_final.pkl')
 
 # baseline 1: predict team with better win percentage to date (if tie then home team)
 baseline1 = df.copy()
