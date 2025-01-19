@@ -62,8 +62,8 @@ def hyperparameter_tuning(df):
                 best_score = score
                 best_params = (c, solver)
     
-    print(f'Best hyperparameters: {best_params}')
-    print(f'Best CV score:{best_score}')
+    #print(f'Best hyperparameters: {best_params}')
+    #print(f'Best CV score:{best_score}')
     
     return best_params
 
@@ -73,6 +73,7 @@ training_df = pd.read_pickle('./Datasets/final.pkl')
 # sort data by date
 training_df = training_df.sort_values('GAME_DATE').reset_index(drop=True)
 
+# Logistic Regression Model
 # perform hyperparameter tuning using time series cross-validation
 hyperparameters = hyperparameter_tuning(training_df)
 
@@ -97,4 +98,4 @@ y_test = test_df['HOME_WIN']
 
 y_pred = model.predict(X_test)
 print(f'Hold-Out Accuracy: {accuracy_score(y_test, y_pred)}')
-print(f'Classification Report: \n {classification_report(y_test, y_pred)}')
+#print(f'Classification Report: \n {classification_report(y_test, y_pred)}')
