@@ -1,3 +1,4 @@
+from requests.exceptions import ReadTimeout
 from nba_api.stats.endpoints import boxscoreadvancedv2, boxscoresummaryv2, boxscorescoringv2, teamgamelog
 from nba_api.stats.static import teams
 import pandas as pd
@@ -25,6 +26,8 @@ def fetch_season_history(teams):
         #starters = boxscorescoringv2.BoxScoreScoringV2(game_id=game).get_data_frames()[0]
 
 
+
+
 teams_df = fetch_team_data()
 team_ids = teams_df['id']
 season_df = fetch_season_history(team_ids)
@@ -36,19 +39,24 @@ all_games = season_df['Game_ID'].unique()
 starts_df = pd.DataFrame()
 inactive_df = pd.DataFrame()
 for game in all_games:
-    starts = boxscorescoringv2.BoxScoreScoringV2(game_id=game).get_data_frames()[0]
-    starts = starts[['GAME_ID', 'TEAM_ID', 'TEAM_ABBREVIATION', 'PLAYER_NAME', 'START_POSITION']]
-    starts['IS_STARTER'] = starts['START_POSITION'].apply(lambda x: 1 if x != '' else 0)
-    starts.drop(columns=['START_POSITION'], inplace=True)
-    starts_df = pd.concat([starts_df, starts])
-    time.sleep(30)
+    for attempt in range(3):
+        try:
+            starts = boxscorescoringv2.BoxScoreScoringV2(game_id=game).get_data_frames()[0]
+            starts = starts[['GAME_ID', 'TEAM_ID', 'TEAM_ABBREVIATION', 'PLAYER_NAME', 'START_POSITION']]
+            starts['IS_STARTER'] = starts['START_POSITION'].apply(lambda x: 1 if x != '' else 0)
+            starts.drop(columns=['START_POSITION'], inplace=True)
+            starts_df = pd.concat([starts_df, starts])
+            time.sleep(10)
 
-    inactive = boxscoresummaryv2.BoxScoreSummaryV2(game_id=game).get_data_frames()[3]
-    inactive['GAME_ID'] = game
-    inactive['PLAYER_NAME'] = inactive.apply(lambda row: row['FIRST_NAME'] + ' ' + row['LAST_NAME'], axis=1)
-    inactive = inactive[['GAME_ID', 'TEAM_ID', 'TEAM_ABBREVIATION', 'PLAYER_NAME']]
-    inactive_df = pd.concat([inactive_df, inactive])
-    time.sleep(30)
+            inactive = boxscoresummaryv2.BoxScoreSummaryV2(game_id=game).get_data_frames()[3]
+            inactive['GAME_ID'] = game
+            inactive['PLAYER_NAME'] = inactive.apply(lambda row: row['FIRST_NAME'] + ' ' + row['LAST_NAME'], axis=1)
+            inactive = inactive[['GAME_ID', 'TEAM_ID', 'TEAM_ABBREVIATION', 'PLAYER_NAME']]
+            inactive_df = pd.concat([inactive_df, inactive])
+            time.sleep(10)
+        except ReadTimeout:
+            print(f'Attempt {attempt + 1}: Request timed out. Retrying...')
+            time.sleep(10)
 
 starts_df = starts_df.sort_values('GAME_ID')
 starts_df['CUMULATIVE_STARTS'] = starts_df.groupby(['TEAM_ABBREVIATION', 'PLAYER_NAME'])['IS_STARTER'].cumsum()
