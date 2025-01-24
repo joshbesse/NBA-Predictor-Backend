@@ -1,12 +1,6 @@
 nba_pred_venv
 
-season_hist.pkl
-adv_stats.pkl
-merged.pkl
-checked.pkl
-final.pkl
-test_merged.pkl
-test_checked.pkl
-test_final.pkl
+Datasets
+Test
 
 __pycache__
