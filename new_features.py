@@ -25,7 +25,9 @@ def fetch_season_history(teams):
     #for game in games:
         #starters = boxscorescoringv2.BoxScoreScoringV2(game_id=game).get_data_frames()[0]
 
-
+starts = pd.read_pickle('./Test/starts.pkl')
+top5 = pd.read_pickle('./Test/top5.pkl')
+df = pd.read_pickle('./Test/test.pkl')
 
 
 teams_df = fetch_team_data()
