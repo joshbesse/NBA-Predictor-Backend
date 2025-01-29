@@ -29,6 +29,10 @@ starts = pd.read_pickle('./Test/starts.pkl')
 top5 = pd.read_pickle('./Test/top5.pkl')
 df = pd.read_pickle('./Test/test.pkl')
 
+print(starts)
+print(top5)
+print(df)
+
 
 teams_df = fetch_team_data()
 team_ids = teams_df['id']
