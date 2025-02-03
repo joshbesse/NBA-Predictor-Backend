@@ -25,13 +25,17 @@ def fetch_season_history(teams):
     #for game in games:
         #starters = boxscorescoringv2.BoxScoreScoringV2(game_id=game).get_data_frames()[0]
 
-starts = pd.read_pickle('./Test/starts.pkl')
-top5 = pd.read_pickle('./Test/top5.pkl')
-df = pd.read_pickle('./Test/test.pkl')
 
-print(starts)
+
+inactive = pd.read_pickle('./Test/inactive.pkl')
+top5 = pd.read_pickle('./Test/top5.pkl')
+merged = pd.read_pickle('./Test/merged.pkl')
+print(inactive)
 print(top5)
-print(df)
+print(merged)
+
+
+
 
 
 teams_df = fetch_team_data()
@@ -67,17 +71,16 @@ for game in all_games:
 starts_df = starts_df.sort_values('GAME_ID')
 starts_df['CUMULATIVE_STARTS'] = starts_df.groupby(['TEAM_ABBREVIATION', 'PLAYER_NAME'])['IS_STARTER'].cumsum()
 starts_df['RANK'] = starts_df.groupby(['GAME_ID', 'TEAM_ABBREVIATION'])['CUMULATIVE_STARTS'].rank(method='first', ascending=False)
-starts_df.to_pickle('./Test/starts.pkl')
 
 top_5_players = starts_df[starts_df['RANK'] <= 5].sort_values(['GAME_ID', 'TEAM_ABBREVIATION', 'RANK'])
+
+merged = pd.merge(top_5_players, inactive_df, on=['GAME_ID', 'TEAM_ID', 'PLAYER_NAME'])
+
+inactive_df.to_pickle('./Test/inactive.pkl')
+starts_df.to_pickle('./Test/test.pkl')
 top_5_players.to_pickle('./Test/top5.pkl')
-
-print(starts_df.head(50))
-print(inactive_df.head(50))
-
-test = pd.merge(top_5_players, inactive_df, on=['GAME_ID', 'TEAM_ID', 'PLAYER_NAME'])
-test.to_pickle('./Test/test.pkl')
-print(test.head(50))
+merged.to_pickle('./Test/merged.pkl')
+print("DataFrames saved.")
 
 #df = df.sort_values('GAME_ID')
 #df['CUMULATIVE_STARTS'] = df.groupby(['TEAM_ABBREVIATION', 'PLAYER_NAME'])['IS_STARTER'].cumsum()
