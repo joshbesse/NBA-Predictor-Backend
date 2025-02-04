@@ -32,8 +32,10 @@ top5 = pd.read_pickle('./Test/top5.pkl')
 merged = pd.read_pickle('./Test/merged.pkl')
 print(inactive)
 print(top5)
-print(merged)
+#print(merged)
 
+test = pd.merge(inactive, top5, on=['GAME_ID', 'TEAM_ID', 'PLAYER_NAME'])
+print(test)
 
 
 
