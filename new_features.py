@@ -37,10 +37,10 @@ print(top5)
 test = pd.merge(inactive, top5, on=['GAME_ID', 'TEAM_ID', 'PLAYER_NAME'])
 print(test)
 
-print(inactive[inactive['GAME_ID'] == '0022301188'])
-print(top5[top5['GAME_ID'] == '0022301188'])
-
-
+inactive_test = inactive[inactive['GAME_ID'] == '0022301188']
+top5_test = top5[top5['GAME_ID'] == '0022301188']
+print(inactive_test)
+print(top5_test)
 
 teams_df = fetch_team_data()
 team_ids = teams_df['id']
