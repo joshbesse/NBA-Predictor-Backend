@@ -42,6 +42,11 @@ top5_test = top5[top5['GAME_ID'] == '0022301188']
 print(inactive_test)
 print(top5_test)
 
+
+
+
+
+
 teams_df = fetch_team_data()
 team_ids = teams_df['id']
 season_df = fetch_season_history(team_ids)
